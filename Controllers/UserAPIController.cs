@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RarePuppers.Data;
 using RarePuppers.Models.ViewModels;
+using RarePuppers.Models.ViewModels.JSONResponse;
+using RarePuppers.Models.ViewModels.NewFolder;
 using RarePuppers.Services;
 
 namespace RarePuppers.Controllers
@@ -36,11 +38,11 @@ namespace RarePuppers.Controllers
 
             if (account.username == null || account.password == null || account.password2 == null)
             {
-                return Json("{ success: false, message: Please fill out all the fields }");
+                return Json(new JSONResponseVM { success= false, message= "Please fill out all the fields" });
             }
             if(account.password != account.password2)
             {
-                return Json("{success: false, message: Passwords don't match}");
+                return Json(new JSONResponseVM {success= false, message= "Passwords don't match"});
             }
 
             //check to see if this username already exists
@@ -48,7 +50,7 @@ namespace RarePuppers.Controllers
             if (query != null)
             {
                 //this username exists
-                return Json("{success: false, message: A user with this username already exists}");
+                return Json(new JSONResponseVM { success= false, message= "A user with this username already exists" });
             }
 
             
@@ -66,7 +68,7 @@ namespace RarePuppers.Controllers
             };
             context.Users.Add(newUser);
             context.SaveChanges();
-            return Json("{success: true, message: created new user " + account.username + "}");
+            return Json(new JSONTokenResponseVM { message="Successfully created account: " + newUser.username, token = "dashfkjadfasdf"});
         }
 
         [HttpPost]
@@ -83,10 +85,10 @@ namespace RarePuppers.Controllers
 
             if(user != null)
             {
-                return Json(user);
+                return Json(new JSONTokenResponseVM { message= "Successfully logged in", token = "hdjkahdajksdhafk" } );
             } else
             {
-                return Json("{success: false, message: Incorrect details}");
+                return Json(new JSONResponseVM { success = false, message = "Incorrect login details"});
             }
         }
     }
