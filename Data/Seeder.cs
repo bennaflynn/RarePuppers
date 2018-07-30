@@ -16,7 +16,7 @@ namespace RarePuppers.Data
         public void SeedData()
         {
             //jump out if data already exists
-            if(context.HomeTypes.Count() != 0)
+            if(context.Roles.Count() != 0)
             {
                 return;
             }

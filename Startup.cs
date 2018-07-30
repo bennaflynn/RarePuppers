@@ -68,7 +68,6 @@ namespace RarePuppers
                 };
             });
 
-
             services.AddMvc();
         }
 

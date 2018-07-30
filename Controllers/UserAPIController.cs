@@ -31,7 +31,9 @@ namespace RarePuppers.Controllers
             this.config = config;
         }
 
-        //TO DO: Add a route to go after the user has created an account
+        //TO DO: Role management, including admin verification
+
+        
         [HttpPost]
         [Route("CreateAccount")]
         public async Task<JsonResult> CreateAccount([FromBody] CreateAccountVM account )

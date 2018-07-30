@@ -68,6 +68,7 @@ namespace RarePuppers.Data
             //prevent auto generation of the id feilds
             builder.Entity<Role>().Property(m => m.role_id).ValueGeneratedNever();
             builder.Entity<HomeType>().Property(m => m.home_type_id).ValueGeneratedNever();
+            builder.Entity<AttributeType>().Property(m => m.attribute_type_id).ValueGeneratedNever();
 
         }
     }
