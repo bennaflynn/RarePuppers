@@ -17,12 +17,46 @@ namespace RarePuppers.Data
         {
         }
 
+        //define the collections
+        public DbSet<User> Users { get; set; }
+        public DbSet<Pupper> Puppers { get; set; }
+        public DbSet<Attribute> Attributes { get; set; }
+        public DbSet<AttributeType> AttributeTypes { get; set; }
+        public DbSet<Home> Homes { get; set; }
+        public DbSet<HomeType> HomeTypes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
-            // Customize the ASP.NET Identity model and override the defaults if needed.
-            // For example, you can rename the ASP.NET Identity table names and more.
-            // Add your customizations after calling base.OnModelCreating(builder);
+            //define the composite primary keys
+            builder.Entity<Pupper>()
+                .HasKey(p => new { p.pupper_id, p.user_id });
+            builder.Entity<Home>()
+                .HasKey(h => new { h.home_id, h.user_id });
+
+            //define foreign keys
+            builder.Entity<Pupper>()
+                .HasOne(p => p.User)
+                .WithMany(p => p.puppers)
+                .HasForeignKey(fk => new { fk.user_id })
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Attribute>()
+                .HasOne(a => a.attribute)
+                .WithMany(a => a.attributes)
+                .HasForeignKey(fk => new { fk.attribute_type_id })
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Home>()
+                .HasOne(h => h.HomeType)
+                .WithMany(h => h.homes)
+                .HasForeignKey(fk => new { fk.home_type_id })
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Home>()
+                .HasOne(h => h.User)
+                .WithMany(h => h.homes)
+                .HasForeignKey(fk => new { fk.user_id })
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 
@@ -36,6 +70,7 @@ namespace RarePuppers.Data
 
         //link the children
         public ICollection<Pupper> puppers { get; set; }
+        public ICollection<Home> homes { get; set; }
     }
 
     //the pupper table
@@ -62,6 +97,46 @@ namespace RarePuppers.Data
         public string name { get; set; }
         public decimal rarity { get; set; }
         public string image_src { get; set; }
+        public int attribute_type_id { get; set; }
+
+        //refernce the parent
+        public virtual AttributeType attribute { get; set; }
 
     }
+
+    public class AttributeType
+    {
+        [Key]
+        public int attribute_type_id { get; set; }
+        public string name { get; set; }
+
+        //reference the children
+        public ICollection<Attribute> attributes { get; set; }
+    }
+
+    public class Home
+    {
+        [Key, Column(Order = 0)]
+        public int home_id { get; set; }
+        [Key, Column(Order = 1)]
+        public int user_id { get; set; }
+        public string name { get; set; }
+        public int home_type_id { get; set; }
+
+        //refernce the parents
+        public virtual User User { get; set; }
+        public virtual HomeType HomeType { get; set; }
+    }
+
+    public class HomeType
+    {
+        [Key]
+        public int home_type_id { get; set; }
+        public int capacity { get; set; }
+        public string name { get; set; }
+
+        //reference the child
+        public ICollection<Home> homes { get; set; }
+    }
+
 }
