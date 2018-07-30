@@ -36,6 +36,19 @@ namespace RarePuppers
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
 
+            //allow cross origin resource sharing
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader()
+                               .AllowCredentials();
+                    });
+            });
+
             services.AddMvc();
         }
 
@@ -55,6 +68,8 @@ namespace RarePuppers
             app.UseStaticFiles();
 
             app.UseAuthentication();
+
+            app.UseCors("AllowAll");
 
             app.UseMvc(routes =>
             {
