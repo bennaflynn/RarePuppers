@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -9,8 +10,10 @@ namespace RarePuppers.Services
 {
     public static class HashString
     {
-        public static string Hash(string input)
+        
+        public static string Hash(string input, string salt)
         {
+            input = input + salt;
             //set up the hashing method
             HashAlgorithm algo = SHA256.Create();
             

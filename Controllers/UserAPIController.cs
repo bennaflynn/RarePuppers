@@ -52,8 +52,8 @@ namespace RarePuppers.Controllers
             }
 
             
-            string newPassword = account.password + config["salt"];
-            newPassword = HashString.Hash(newPassword);
+            string newPassword = account.password;
+            newPassword = HashString.Hash(newPassword, config["salt"]);
 
             //now add the new user to the database
             User newUser = new User
@@ -67,6 +67,27 @@ namespace RarePuppers.Controllers
             context.Users.Add(newUser);
             context.SaveChanges();
             return Json("{success: true, message: created new user " + account.username + "}");
+        }
+
+        [HttpPost]
+        [Route("Login")]
+        public async Task<JsonResult> Login([FromBody] LoginVM loginUser)
+        {
+            //hash the password
+            string password = HashString.Hash(loginUser.password, config["salt"]);
+
+            var user = await context.Users
+                .Where(u => u.username == loginUser.username)
+                .Where(u => u.hashedPassword == password)
+                .FirstOrDefaultAsync();
+
+            if(user != null)
+            {
+                return Json(user);
+            } else
+            {
+                return Json("{success: false, message: Incorrect details}");
+            }
         }
     }
 }
