@@ -11,6 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 using RarePuppers.Data;
 using RarePuppers.Models;
 using RarePuppers.Services;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace RarePuppers
 {
@@ -48,6 +51,23 @@ namespace RarePuppers
                                .AllowCredentials();
                     });
             });
+
+            //enable and set up JWT
+           
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            services.AddAuthentication()
+            .AddJwtBearer(cfg => {
+                cfg.RequireHttpsMetadata = false;
+                cfg.SaveToken = true;
+                cfg.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = Configuration["TokenInformation:Issuer"],
+                    ValidAudience = Configuration["TokenInformation:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenInformation:Key"])),
+                    ClockSkew = TimeSpan.Zero // remove delay of token when expire
+                };
+            });
+
 
             services.AddMvc();
         }

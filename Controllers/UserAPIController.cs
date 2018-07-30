@@ -4,6 +4,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -68,7 +70,11 @@ namespace RarePuppers.Controllers
             };
             context.Users.Add(newUser);
             context.SaveChanges();
-            return Json(new JSONTokenResponseVM { message="Successfully created account: " + newUser.username, token = "dashfkjadfasdf"});
+
+            //generate the token
+            GenerateJWT jwtGen = new GenerateJWT();
+            TokenVM tok = jwtGen.Generate(newUser.username, config);
+            return Json(new JSONTokenResponseVM { message="Successfully created account: " + newUser.username, token = tok.token});
         }
 
         [HttpPost]
@@ -85,11 +91,23 @@ namespace RarePuppers.Controllers
 
             if(user != null)
             {
-                return Json(new JSONTokenResponseVM { message= "Successfully logged in", token = "hdjkahdajksdhafk" } );
+                //Generate the JWT
+                GenerateJWT jwtGen = new GenerateJWT();
+                TokenVM token = jwtGen.Generate(user.username, config);
+                return Json(new JSONTokenResponseVM { message= "Successfully logged in", token = token.token } );
             } else
             {
                 return Json(new JSONResponseVM { success = false, message = "Incorrect login details"});
             }
+        }
+
+        //TO DO: Delete this test
+        [HttpGet]
+        [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme)]
+        [Route("Test")]
+        public JsonResult Test()
+        {
+            return Json(new JSONResponseVM { success = true, message = "In baby" });
         }
     }
 }
