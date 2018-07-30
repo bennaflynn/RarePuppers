@@ -19,6 +19,7 @@ namespace RarePuppers.Data
 
         //define the collections
         public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
         public DbSet<Pupper> Puppers { get; set; }
         public DbSet<Attribute> Attributes { get; set; }
         public DbSet<AttributeType> AttributeTypes { get; set; }
@@ -34,6 +35,12 @@ namespace RarePuppers.Data
                 .HasKey(h => new { h.home_id, h.user_id });
 
             //define foreign keys
+            builder.Entity<User>()
+                .HasOne(u => u.role)
+                .WithMany(u => u.Users)
+                .HasForeignKey(fk => new { fk.role_id })
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Pupper>()
                 .HasOne(p => p.User)
                 .WithMany(p => p.puppers)
@@ -57,6 +64,11 @@ namespace RarePuppers.Data
                 .WithMany(h => h.homes)
                 .HasForeignKey(fk => new { fk.user_id })
                 .OnDelete(DeleteBehavior.Restrict);
+
+            //prevent auto generation of the id feilds
+            builder.Entity<Role>().Property(m => m.role_id).ValueGeneratedNever();
+            builder.Entity<HomeType>().Property(m => m.home_type_id).ValueGeneratedNever();
+
         }
     }
 
@@ -67,11 +79,26 @@ namespace RarePuppers.Data
         public int user_id { get; set; }
         public string username { get; set; }
         public string hashedPassword { get; set; }
+        public int role_id { get; set; }
+
+        //link the parent
+        public virtual Role role { get; set; }
 
         //link the children
         public ICollection<Pupper> puppers { get; set; }
         public ICollection<Home> homes { get; set; }
     }
+
+    //the roles table
+    public class Role
+    {
+        [Key]
+        public int role_id { get; set; }
+        public string role_name { get; set; }
+
+        public ICollection<User> Users { get; set; }
+    }
+
 
     //the pupper table
     public class Pupper
@@ -134,6 +161,7 @@ namespace RarePuppers.Data
         public int home_type_id { get; set; }
         public int capacity { get; set; }
         public string name { get; set; }
+        public string home_image_src { get; set; }
 
         //reference the child
         public ICollection<Home> homes { get; set; }
