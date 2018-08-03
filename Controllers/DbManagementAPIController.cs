@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using RarePuppers.Data;
 using RarePuppers.Models.ViewModels.DbItems;
 using RarePuppers.Models.ViewModels.NewFolder;
+using RarePuppers.Services;
 
 namespace RarePuppers.Controllers
 {
@@ -18,10 +19,15 @@ namespace RarePuppers.Controllers
     public class DbManagementAPIController : Controller
     {
         ApplicationDbContext context;
+        private readonly string currentusername;
         //TO DO: Add validation to ensure that user is an admin
-        public DbManagementAPIController(ApplicationDbContext context)
+        public DbManagementAPIController(
+            ApplicationDbContext context,
+            IHttpContextAccessor accessor
+            )
         {
             this.context = context;
+            this.currentusername = GetCurrentUsername.CurrentUser(accessor);
         }
 
         [HttpPost]
@@ -30,6 +36,10 @@ namespace RarePuppers.Controllers
         public JSONResponseVM AddNewPupperAttributeType([FromBody] AttributeTypeVM attr)
         {
             //TO DO: check to see if the user is an admin
+            if(!CheckIfAdmin.IsAdmin(currentusername, context))
+            {
+                return new JSONResponseVM { success= false, message = "You need to be an admin to do this" };
+            }
 
             //does this attribute exists?
             var query = context.AttributeTypes.Where(a => a.attribute_type_id == attr.attribute_type_id).FirstOrDefault();

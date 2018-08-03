@@ -14,6 +14,7 @@ using RarePuppers.Services;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace RarePuppers
 {
@@ -67,6 +68,9 @@ namespace RarePuppers
                     ClockSkew = TimeSpan.Zero // remove delay of token when expire
                 };
             });
+
+            //this service allows us to get the current user
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddMvc();
         }

@@ -71,6 +71,8 @@ namespace RarePuppers.Data
             builder.Entity<AttributeType>().Property(m => m.attribute_type_id).ValueGeneratedNever();
 
         }
+
+        
     }
 
     //the user table
