@@ -81,6 +81,7 @@ namespace RarePuppers.Data
         public string username { get; set; }
         public string hashedPassword { get; set; }
         public int role_id { get; set; }
+        public int points { get; set; }
 
         //link the parent
         public virtual Role role { get; set; }
